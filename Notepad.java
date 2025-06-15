@@ -18,7 +18,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 public class Notepad implements ActionListener {
-    JFrame jf,replaceFrame;
+    JFrame jf,replaceFrame,font_family;
     File filee;
     JFileChooser filechooser;
 
@@ -28,8 +28,10 @@ public class Notepad implements ActionListener {
     JMenuItem newItem, openItem, saveItem, saveAsItem, pageSetupItem, printItem, exitItem,EditItemCut,EditItemCopy;
     JMenuItem EditItempaste,Editreplace,Editdatetime,Formatfont,Formatfontcolor,FormatTextAreaColor;
     JTextArea ta;
+    JCheckBoxMenuItem wordwrap;
     JTextField ts1,ts;
-    JButton jb;
+    JButton jb,font_button;
+    JComboBox combobox,fontStyle,fontsize;
     public Notepad() {
         try {
             // Set Windows look and feel
@@ -78,14 +80,15 @@ public class Notepad implements ActionListener {
             Editdatetime = new JMenuItem("DateTime");
             Editdatetime.addActionListener(this);
 
+            wordwrap=new JCheckBoxMenuItem("Word wrap");
+            wordwrap.addActionListener(this);
+
             Formatfont = new JMenuItem("Font");
             Formatfont.addActionListener(this);
             Formatfontcolor = new JMenuItem("Fontcolor");
             Formatfontcolor.addActionListener(this);
             FormatTextAreaColor = new JMenuItem ("Textarea Color");
             FormatTextAreaColor.addActionListener(this);
-
-
 
 
             // Add keyboard shortcuts (accelerators)
@@ -113,6 +116,8 @@ public class Notepad implements ActionListener {
             EditMenu.add(Editreplace);
             EditMenu.add(Editdatetime);
 
+            FormatMenu.add(wordwrap);
+            FormatMenu.addSeparator();
             FormatMenu.add(Formatfont);
             FormatMenu.add(Formatfontcolor);
             FormatMenu.add(FormatTextAreaColor);
@@ -215,8 +220,84 @@ public class Notepad implements ActionListener {
         {
             setTextColor();
         }
+        if(e.getSource()==Formatfont)
+        {
+            fontfamily();
+        }
+        if(e.getSource()==font_button)
+        {
+            setFonttoNotepad();
+        }
+        if(e.getSource()==wordwrap)
+        {
+            boolean b=wordwrap.getState();
+            ta.setLineWrap(b);
+        }
     }
 
+    public void fontfamily()
+    {
+        font_family = new JFrame("Fonts...");
+        font_family.setSize(650,300);
+        font_family.setLayout(null);
+
+
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        String fonts[] = ge.getAvailableFontFamilyNames();
+        combobox = new JComboBox(fonts);
+        combobox.setBounds(50,50,200,40);
+        font_family.add(combobox);
+
+        String[] Font_style={"Plain","Bold","Italic"};
+        fontStyle = new JComboBox(Font_style);
+        fontStyle.setBounds(300,50,100,40);
+        font_family.add(fontStyle);
+
+        Integer[] font_size = {8, 10, 12, 14, 16, 18, 20, 24, 30, 35, 42, 50, 57, 64, 70, 78, 90, 95, 100};
+        fontsize = new JComboBox(font_size);
+        fontsize.setBounds(450,50,80,40);
+
+        font_family.add(fontsize);
+
+         font_button = new JButton("Ok");
+        font_button.setBounds(250,150,80,50);
+        font_button.addActionListener(this);
+        font_family.add(font_button);
+        font_family.setVisible(true);
+        URL iconURL = getClass().getResource("/NotepadEditor/notepad.png"); // Path from resources root
+        if (iconURL != null) {
+            ImageIcon icon = new ImageIcon(iconURL);
+            font_family.setIconImage(icon.getImage());
+        } else {
+            System.err.println("Icon not found.");
+        }
+    }
+    public void setFonttoNotepad()
+    {
+        String font_family_var =(String)combobox.getSelectedItem();
+        Integer font_size_var =(Integer)fontsize.getSelectedItem();
+        String font_style_var =(String)fontStyle.getSelectedItem();
+
+        int font_style=0;
+        if(font_style_var.equals("Plain"))
+        {
+            font_style=Font.PLAIN;
+        }
+
+        else if(font_style_var.equals("Italic"))
+        {
+            font_style=Font.ITALIC;
+        }
+        else if(font_style_var.equals("Bold"))
+        {
+            font_style=Font.BOLD;
+        }
+
+        Font f = new Font(font_family_var,font_style,font_size_var);
+        ta.setFont(f);
+        font_family.setVisible(true);
+
+    }
     public void fontcolorchange()
     {
            Color c= JColorChooser.showDialog(jf,"Select Font color",Color.black);
